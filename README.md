@@ -1,1 +1,1 @@
-# Neural Collaborative Filtering
+# Restricted Boltzmann Machine for Collaborative Filtering
