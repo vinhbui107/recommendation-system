@@ -1,4 +1,4 @@
-from utils import connect_db
+from utils.helpers import connect_db
 
 
 def export_first_time():

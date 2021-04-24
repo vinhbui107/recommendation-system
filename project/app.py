@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 import psycopg2
 
-from utils import connect_db
+from utils.helpers import connect_db
 
 
 app = Flask(__name__)
