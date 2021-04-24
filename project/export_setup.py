@@ -1,7 +1,7 @@
-from utils.helpers import connect_db
+from .helpers import connect_db
 
 
-def export_first_time():
+def export_setup():
     cur = connect_db()
     if not cur:
         print("Connect Database failed")
@@ -10,7 +10,8 @@ def export_first_time():
     query_user = "SELECT \
                 id as user_id, \
                 date_part('year', CURRENT_DATE) - date_part('year', birthday) as age, \
-                gender as sex, occupation \
+                gender as sex, \
+                occupation \
             FROM public.user \
             ORDER BY id"
 
@@ -31,4 +32,4 @@ def export_first_time():
 
 
 if __name__ == "__main__":
-    export_first_time()
+    export_setup()
