@@ -12,10 +12,12 @@ app = Flask(__name__)
 CORS(app)
 
 
-# Display hello
-@app.route("/")
-def home():
-    return "Hello from Recommendation System api"
+def _get_df_recommend(user_id):
+    return
+
+
+def _get_cf_recommend(user_id):
+    return
 
 
 # get movies recommend for user with username
