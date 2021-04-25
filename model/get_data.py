@@ -6,23 +6,27 @@ def get_users_data():
     Get demographic data of users
     Output: matrix users
     """
-    _user_cols = ["user_id", "age", "sex", "occupation"]
-    users = pd.read_csv("./data/users.csv", sep="|", names=_user_cols)
+    users = pd.read_csv(
+        "C:/Dev/recommendation-system/model/data/users.csv",
+        sep=",",
+    )
 
     return users
 
 
-def get_rating_data():
+def get_ratings_data():
     """
     Get rating_test data
     Output: dataframe rating_test
     """
-    _rating_cols = ["user_id", "movie_id", "rating"]
     rating_test = pd.read_csv(
-        "./data/ratings.csv", sep="\t", names=_rating_cols, encoding="latin-1"
+        "C:/Dev/recommendation-system/model/data/ratings.csv",
+        sep=",",
+        encoding="latin-1",
     )
     return rating_test
 
 
 if __name__ == "__main__":
-    print(get_rating_data())
+
+    print(get_users_data())

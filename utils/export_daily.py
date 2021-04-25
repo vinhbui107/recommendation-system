@@ -6,7 +6,6 @@ def export_daily():
     if not cur:
         print("Connect Database failed")
 
-    # export rating table
     query_rating = "SELECT user_id, movie_id, rating FROM rating ORDER BY user_id, movie_id"
 
     outputquery = "COPY ({0}) TO STDOUT WITH CSV HEADER".format(query_rating)
