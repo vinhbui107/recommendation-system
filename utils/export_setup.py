@@ -28,6 +28,15 @@ def export_setup():
     with open("model/data/ratings.csv", "w") as f:
         cur.copy_expert(outputquery, f)
 
+    # export movies table
+    query_rating = "SELECT id as movie_id, title, year, poster, rating_average, slug \
+                    FROM movie ORDER BY id"
+
+    outputquery = "COPY ({0}) TO STDOUT WITH CSV HEADER".format(query_rating)
+
+    with open("model/data/movies.csv", "w") as f:
+        cur.copy_expert(outputquery, f)
+
     cur.close()
 
 
