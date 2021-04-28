@@ -1,14 +1,7 @@
-#!/usr/bin/env python3
-
-
-import sys
-import os
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(BASE_DIR)
-
 from decouple import config
 import psycopg2
+import os
+import pandas as pd
 
 
 def connect_db():
@@ -29,4 +22,29 @@ def connect_db():
         )
         return conn.cursor()
     except (Exception, psycopg2.DatabaseError) as error:
-        return False
+        return error
+
+
+def get_users_data():
+    """
+    Get demographic data of users
+    Output: matrix users
+    """
+    users = pd.read_csv(
+        "model/data/users.csv",
+        sep=",",
+    )
+    return users
+
+
+def get_ratings_data():
+    """
+    Get rating_test data
+    Output: dataframe rating_test
+    """
+    rating_test = pd.read_csv(
+        "model/data/ratings.csv",
+        sep=",",
+        encoding="latin-1",
+    )
+    return rating_test
