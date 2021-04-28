@@ -18,8 +18,8 @@ class DF(object):
         self.dist_func = dist_func
 
         # number of users and items. Remember to add 1 since id starts from 0
-        self.n_users = int(np.max(self.Y_data[:, 0])) + 1
-        self.n_items = int(np.max(self.Y_data[:, 1])) + 1
+        self.n_users = len(set(self.Y_data[:, 0])) #  int(np.max(self.Y_data[:, 0])) + 1
+        self.n_items = len(set(self.Y_data[:, 1])) #  int(np.max(self.Y_data[:, 1])) + 1
 
         self.Ybar_data = None
 
