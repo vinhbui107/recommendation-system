@@ -2,7 +2,7 @@ import numpy as np
 from scipy import sparse
 from scipy.stats import pearsonr
 
-from .get_data import get_rating_data
+from get_data import get_rating_data
 
 
 import warnings
