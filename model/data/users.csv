@@ -1,5 +1,5 @@
 user_id,age,sex,occupation
-1,19,M,daefef
+1,19,F,Student
 2,74,M,Self-employed
 3,43,M,Scientist
 4,63,M,Executive
@@ -942,6 +942,3 @@ user_id,age,sex,occupation
 941,36,M,Writer
 942,68,F,Doctor
 943,63,F,Programmer
-944,53,M,Other
-945,63,M,Executive
-946,53,M,Executive
