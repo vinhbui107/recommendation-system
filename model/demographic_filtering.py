@@ -2,10 +2,6 @@ import numpy as np
 import pandas as pd
 from scipy import sparse
 from sklearn.metrics.pairwise import cosine_similarity
-from get_data import (
-    get_users_data,
-    get_rating_data,
-)
 
 
 class DF(object):
@@ -18,8 +14,8 @@ class DF(object):
         self.dist_func = dist_func
 
         # number of users and items. Remember to add 1 since id starts from 0
-        self.n_users =  len(users)# int(np.max(self.Y_data[:, 0])) + 1
-        self.n_items =  int(np.max(self.Y_data[:, 1])) + 1
+        self.n_users = len(users)  # int(np.max(self.Y_data[:, 0])) + 1
+        self.n_items = int(np.max(self.Y_data[:, 1])) + 1
 
         self.Ybar_data = None
 
@@ -174,18 +170,3 @@ class DF(object):
             new_row = [u, i, predicted]
             predicted_ratings.append(new_row)
         return np.asarray(predicted_ratings).astype("float64")
-
-    def display(self):
-        """
-        Display all items which should be recommend for each user
-        """
-        for u in range(self.n_users):
-            predicted_ratings = self.recommend(u)
-            predicted_ratings = predicted_ratings[
-                predicted_ratings[:, 2].argsort(kind="quicksort")[::-1]
-            ]
-            print(
-                "Recommendation: {0} for user {1}".format(
-                    predicted_ratings[:, 1], u
-                )
-            )
