@@ -2,10 +2,6 @@ import numpy as np
 import pandas as pd
 from scipy import sparse
 from sklearn.metrics.pairwise import cosine_similarity
-from get_data import (
-    get_users_data,
-    get_ratings_data,
-)
 
 
 class DF(object):
@@ -18,8 +14,8 @@ class DF(object):
         self.dist_func = dist_func
 
         # number of users and items. Remember to add 1 since id starts from 0
-        self.n_users = len(set(self.Y_data[:, 0])) #  int(np.max(self.Y_data[:, 0])) + 1
-        self.n_items = len(set(self.Y_data[:, 1])) #  int(np.max(self.Y_data[:, 1])) + 1
+        self.n_users = len(users)  # int(np.max(self.Y_data[:, 0])) + 1
+        self.n_items = int(np.max(self.Y_data[:, 1])) + 1
 
         self.Ybar_data = None
 
@@ -70,9 +66,6 @@ class DF(object):
         )
 
         # self.users_features['male'] = self.users_features['sex'].map({'M': "1", 'F': "0"})
-        self.users_features.drop(
-            ["zip_code", "sex"], axis=1, inplace=True
-        )  # we dont need it
 
         # The get_dummies() function is used to convert categorical variable
         # into dummy/indicator variables.
@@ -171,67 +164,9 @@ class DF(object):
         self.pred(u, i) > 0. Suppose we are considering items which
         have not been rated by u yet.
         """
-        ids = np.where(self.Y_data[:, 0] == u)[0]
-        items_rated_by_u = self.Y_data[ids, 1].tolist()
         predicted_ratings = []
         for i in range(self.n_items):
-            if i not in items_rated_by_u:
-                predicted = self.pred(u, i)
-                if predicted > 0:
-                    new_row = [u, i, predicted]
-                    predicted_ratings.append(new_row)
+            predicted = self.pred(u, i)
+            new_row = [u, i, predicted]
+            predicted_ratings.append(new_row)
         return np.asarray(predicted_ratings).astype("float64")
-
-    def display(self):
-        """
-        Display all items which should be recommend for each user
-        """
-        for u in range(self.n_users):
-            predicted_ratings = self.recommend(u)
-            predicted_ratings = predicted_ratings[
-                predicted_ratings[:, 2].argsort(kind="quicksort")[::-1]
-            ]
-            print(
-                "Recommendation: {0} for user {1}".format(
-                    predicted_ratings[:, 1], u
-                )
-            )
-
-    def recommend_all_users(self, data):
-        """
-        Return matrix with predict and real rating for all user
-        """
-        result = np.empty((0, 3))
-
-        for user in list(set(data[:, 0])):
-            # get 2d array rating of current user [u, i, rating]
-            ids = np.where(data[:, 0] == user)[0]
-            items_rated_by_u = data[ids]
-
-            # create empty 2d array predict rating of user
-            predict_ratings_u = np.empty((0, 3))
-
-            items_not_rate = [
-                x
-                for x in range(self.n_items)
-                if x not in items_rated_by_u[:, 1]
-            ]
-
-            for item in items_not_rate[:]:
-                predict_rating = self.pred(user, item)
-                # append new row predict rating data into array
-                predict_ratings_u = np.append(
-                    predict_ratings_u, [[user, item, predict_rating]], axis=0
-                )
-
-            # now we have real and predict rating of current user
-            # i will sort predict rating data and get top 20
-            # result : top 20 predict rating + real rating (from rate test data)
-
-            predict_ratings_u_sorted = predict_ratings_u[
-                predict_ratings_u[:, 2].argsort(kind="quicksort")[::-1][0:20]
-            ]
-            result = np.append(result, items_rated_by_u, axis=0)
-            result = np.append(result, predict_ratings_u_sorted, axis=0)
-
-        return result
