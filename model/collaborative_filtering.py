@@ -117,6 +117,6 @@ class CF(object):
             if i not in items_rated_by_u:
                 predicted = self.pred(u, i)
                 if predicted > 0:
-                    new_row = [u, i, predicted]
+                    new_row = [u + 1, i + 1, predicted]  # start 1 again :)
                     predicted_ratings.append(new_row)
         return np.asarray(predicted_ratings).astype("float64")
