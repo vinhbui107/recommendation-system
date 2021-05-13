@@ -3,8 +3,10 @@ import os
 import pandas as pd
 import numpy as np
 import psycopg2
+import psycopg2.extras
 from decouple import config
 from model import collaborative_filtering, demographic_filtering
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -25,15 +27,47 @@ def connect_db():
             host=DB_HOST,
             port=DB_PORT,
         )
-        return conn.cursor()
+        return conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     except (Exception, psycopg2.DatabaseError) as error:
         return error
+
+
+def export_data():
+    cur = connect_db()
+    if cur:
+        print("Connect Database success.")
+    else:
+        print("Connect Database failed.")
+
+    # export user table
+    query_user = "SELECT \
+                id as user_id, \
+                date_part('year', CURRENT_DATE) - date_part('year', birthday) as age, \
+                gender as sex, \
+                occupation \
+            FROM public.user \
+            ORDER BY id"
+
+    outputquery = "COPY ({0}) TO STDOUT WITH CSV HEADER".format(query_user)
+
+    with open("model/data/users.csv", "w") as f:
+        cur.copy_expert(outputquery, f)
+
+    # export rating table
+    query_rating = "SELECT user_id, movie_id, rating FROM rating ORDER BY user_id, movie_id"
+
+    outputquery = "COPY ({0}) TO STDOUT WITH CSV HEADER".format(query_rating)
+
+    with open("model/data/ratings.csv", "w") as f:
+        cur.copy_expert(outputquery, f)
+
+    cur.close()
 
 
 def get_users_data():
     """
     Get demographic data of users
-    Output: matrix users
+    Output: dataframe user
     """
     users = pd.read_csv(
         "model/data/users.csv",
@@ -45,7 +79,7 @@ def get_users_data():
 def get_ratings_data():
     """
     Get rating_test data
-    Output: dataframe rating_test
+    Output: dataframe rating
     """
     rating_test = pd.read_csv(
         "model/data/ratings.csv",
@@ -55,27 +89,35 @@ def get_ratings_data():
     return rating_test
 
 
+def get_predicted_data(path):
+    data = pd.read_csv(
+        path,
+        sep=",",
+        encoding="latin-1",
+    )
+    return data
+
+
 def pred_for_users(users_df, ratings_df, users_for_predict, model_mode=None):
     """
     This function to train then predict for all users in users list
     @params:
         users_df: dataframe of users
-        ratings_df: dataframe of rating
+        ratings_df: dataframe of ratings
         users_for_predict: users for predict
         model_mode: CF or DF
     """
     if model_mode == "DF":
-        path = "model/data_predicted/df.csv"
+        result_path_csv = "model/data_predicted/df.csv"
         model = demographic_filtering.DF(users_df, ratings_df, 25)
-        model.fit()
     elif model_mode == "CF":
-        path = "model/data_predicted/cf.csv"
+        result_path_csv = "model/data_predicted/cf.csv"
         model = collaborative_filtering.CF(ratings_df, 25)
-        model.fit()
 
+    model.fit()
     result = pd.DataFrame(columns=["user_id", "movies"])
     for user in users_for_predict:
-        print("Predict for user: {}".format(user))
+        print("Predict for user: {}".format(user + 1))
 
         # predict ratings for current user
         predict_ratings_u = model.recommend(user)
@@ -94,4 +136,18 @@ def pred_for_users(users_df, ratings_df, users_for_predict, model_mode=None):
         )
 
     # save to csv file
-    result.to_csv(path, index=False)
+    result.to_csv(result_path_csv, index=False)
+
+
+def find_movies_recommend(user_id):
+    cf_data = get_predicted_data("model/data_predicted/cf.csv")
+    df_data = get_predicted_data("model/data_predicted/df.csv")
+
+    try:
+        if int(user_id) in cf_data["user_id"]:
+            data_row = cf_data.loc[cf_data["user_id"] == int(user_id)]
+        else:
+            data_row = df_data.loc[df_data["user_id"] == int(user_id)]
+        return data_row["movies"].values[0]
+    except:
+        return None

@@ -167,6 +167,6 @@ class DF(object):
         predicted_ratings = []
         for i in range(self.n_items):
             predicted = self.pred(u, i)
-            new_row = [u, i, predicted]
+            new_row = [u + 1, i + 1, predicted]  # start 1 again :)
             predicted_ratings.append(new_row)
         return np.asarray(predicted_ratings).astype("float64")
