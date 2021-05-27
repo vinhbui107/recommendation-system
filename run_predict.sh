@@ -1,1 +1,1 @@
-python predict.py
+python /app/predict.py
