@@ -25,7 +25,7 @@ def home():
 
 
 # get movies recommend for user with username
-@app.route("/api/recommend/<username>")
+@app.route("/api/recommend/<username>", methods=["GET"])
 def get_movies_recommend(username):
 
     cur.execute(
@@ -40,12 +40,8 @@ def get_movies_recommend(username):
         message = jsonify(message="User not found.")
         return make_response(message, 400)
 
-    movie_ids = (
-        movies_recommend.replace("  ", " ")
-        .replace("\n", "")
-        .replace(" ", ", ")
-    )
-    movie_ids = ast.literal_eval(movie_ids)
+    movie_ids = movies_recommend.replace("[", "").replace("]", "").split()
+    # movie_ids = ast.literal_eval(movie_ids)
 
     cur.execute(
         "select * from public.movie where id in {}".format(tuple(movie_ids))
